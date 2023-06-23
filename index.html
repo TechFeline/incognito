@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Anonymous Chat App</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+  <div class="chat-container">
+    <div id="chat-messages"></div>
+    <form id="chat-form">
+      <input type="text" id="message-input" placeholder="Type your message...">
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script type="module">
+    // Import the necessary functions from the Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      // Add your Firebase project configuration here
+      apiKey: "AIzaSyC8_GVEtW37FyFpoF617V0Nb8OmWswJ68s",
+  authDomain: "ananonymous-chat.firebaseapp.com",
+  databaseURL: "https://ananonymous-chat-default-rtdb.firebaseio.com",
+  projectId: "ananonymous-chat",
+  storageBucket: "ananonymous-chat.appspot.com",
+  messagingSenderId: "453766818404",
+  appId: "1:453766818404:web:1e06a37bcee9efdc330d71",
+  measurementId: "G-LNE2QPMB19"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // Get a reference to the database
+    const database = getDatabase(app);
+    const messagesRef = ref(database, "messages");
+
+    // Function to send a message
+    function sendMessage(message) {
+      // Push the message to the database using push()
+      push(messagesRef, message);
+    }
+
+    // Listen for the form submission event
+    const form = document.getElementById("chat-form");
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      const input = document.getElementById("message-input");
+      const message = {
+        text: input.value,
+        timestamp: Date.now()
+      };
+      sendMessage(message);
+      input.value = "";
+    });
+
+    // Listen for new messages from the database
+    onValue(messagesRef, function(snapshot) {
+      const chatMessages = document.getElementById("chat-messages");
+      chatMessages.innerHTML = ""; // Clear the existing messages
+      snapshot.forEach(function(childSnapshot) {
+        const message = childSnapshot.val();
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message");
+        messageElement.innerHTML = `
+          <span class="message-text">${message.text}</span>
+          <span class="message-time">${formatTimestamp(message.timestamp)}</span>
+        `;
+        chatMessages.appendChild(messageElement);
+      });
+    });
+
+    // Function to format timestamp into a readable format
+    function formatTimestamp(timestamp) {
+      const date = new Date(timestamp);
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      return `${hours}:${minutes < 10 ? "0" + minutes : minutes}`;
+    }
+  </script>
+</body>
+</html>
