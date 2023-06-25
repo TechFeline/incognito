@@ -6,13 +6,13 @@
 </head>
 <body>
   <div class="nav">
-    <a href="#"><li>General Chat</li></a>
-    <a href="pages/gcek.html"><li>GCEK</li></a>
+    <a href="../index.html"><li>General Chat</li></a>
+    <a href="#"><li>GCEK</li></a>
     <a href="pages/confession.html"><li>Confessions</li></a>
     <a href="pages/complaint.html"><li>Complaint</li></a>
     <a href="pages/toxic.html"><li>Toxic</li></a>
   </div>
-<h1>General Chat</h1>
+
   <div class="chat-container">
     <div id="chat-messages"></div>
   </div>
@@ -40,10 +40,11 @@
   projectId: "ananonymous-chat",
   storageBucket: "ananonymous-chat.appspot.com",
   messagingSenderId: "453766818404",
-  appId: "1:453766818404:web:1e06a37bcee9efdc330d71",
-  measurementId: "G-LNE2QPMB19"
+  appId: "1:453766818404:web:ce65146710112c0e330d71",
+  measurementId: "G-676EH0XTG9"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
 
@@ -74,23 +75,19 @@
     onValue(messagesRef, function(snapshot) {
       const chatMessages = document.getElementById("chat-messages");
       chatMessages.innerHTML = ""; // Clear the existing messages
-      const messages = [];
       snapshot.forEach(function(childSnapshot) {
-        messages.unshift(childSnapshot.val());
-      });
-      messages.forEach(function(message) {
+        const message = childSnapshot.val();
         const messageElement = document.createElement("div");
         messageElement.classList.add("message");
         messageElement.innerHTML = `
           <span class="message-text">${message.text}</span>
           <span class="message-time">${formatTimestamp(message.timestamp)}</span>
-          <span class="message-date">${formatDate(message.timestamp)}</span>
         `;
-        chatMessages.prepend(messageElement);
+        chatMessages.appendChild(messageElement);
       });
     });
 
-    // Function to format timestamp into a readable time format
+    // Function to format timestamp into a readable format
     function formatTimestamp(timestamp) {
       const date = new Date(timestamp);
       const hours = date.getHours();
@@ -98,12 +95,7 @@
       return `${hours}:${minutes < 10 ? "0" + minutes : minutes}`;
     }
 
-    // Function to format timestamp into a readable date format
-    function formatDate(timestamp) {
-      const date = new Date(timestamp);
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return date.toLocaleDateString(undefined, options);
-    }
+   
   </script>
 </body>
 </html>
